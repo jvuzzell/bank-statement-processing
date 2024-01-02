@@ -1,0 +1,21 @@
+{
+    "name": "jvuzzell/bankstatementprocessing",
+    "description": "Software for extracting transaction data from bank statements",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Jvuzzell\\BankStatementProcessing\\": "src/Jvuzzell/BankStatementProcessing/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Joshua Uzzell",
+            "email": "josh.uzzell@gmail.com"
+        }
+    ],
+    "require": {
+        "vlucas/phpdotenv": "^5.5", 
+        "smalot/pdfparser": "^0.14.0", 
+        "phpoffice/phpword": "^0.18.2"
+    }
+}
