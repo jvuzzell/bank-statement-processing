@@ -15,7 +15,7 @@ fputcsv($handle, array('Transaction Date', 'Description', 'Credit/Debit', 'Amoun
 
 foreach($statementManifest as $statement) {   
     $bankFormat = parseFilename($statement); 
-    $accountNumber = $bankFormat['accountNumber']; 
+    $accountNumbers = $bankFormat['accountNumbers']; 
     $date = $bankFormat['month'] . '-' . $bankFormat['year'];
     $statementProcessor = BankStatementProcessorFactory::create($bankFormat['bankName'], STATEMENT_DIR . $statement);
     $statementProcessor->extractTransactions();
@@ -25,7 +25,6 @@ foreach($statementManifest as $statement) {
     foreach ($transactions as $transaction) { 
         fputcsv($handle, $transaction);
     }
-
 }
 
 fclose($handle);
