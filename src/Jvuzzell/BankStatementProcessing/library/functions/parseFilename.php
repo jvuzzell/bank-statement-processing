@@ -1,7 +1,7 @@
 <?php
 
-function parseFilename($filename) : array | bool {
-    $pattern = '/^([a-zA-Z]+)-([a-zA-Z]+)_([a-zA-Z0-9]+)_(\d{2})(\d{4})_(\d{4})(?:-(\d{4}))?(?:-(\d{4}))?/';  
+function parseFilename($filename) : array | bool { 
+    $pattern = '/^([a-zA-Z]+)-([a-zA-Z]+)_([a-zA-Z0-9]+)_(\d{2})(\d{4})_(\d{4})(?:-(\d{4}))?(?:-(\d{4}))?\.([a-zA-Z]+)$/';  
     preg_match($pattern, $filename, $matches);
 
     if (preg_match($pattern, $filename, $matches)) {
@@ -11,9 +11,10 @@ function parseFilename($filename) : array | bool {
             'bankName'       => $matches[3],
             'month'          => $matches[4],
             'year'           => $matches[5],
-            'accountNumbers' => [$matches[6]]
+            'accountNumbers' => [$matches[6]], 
+            'fileType'       => $matches[9]
         ];
-
+    
         // Check if additional account numbers are present and add them to the result
         if (!empty($matches[7])) {
             $result['accountNumbers'][] = $matches[7];

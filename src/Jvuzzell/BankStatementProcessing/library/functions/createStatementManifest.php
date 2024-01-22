@@ -1,11 +1,11 @@
 <?php 
 
 function createStatementManifest($directoryPath) : array {
-    $pdfFiles = glob($directoryPath . '*');
+    $files = glob($directoryPath . '*');
     $manifest = [];
 
-    foreach ($pdfFiles as $pdfFile) {
-        $manifest[] = basename($pdfFile);
+    foreach ($files as $file) {
+        $manifest[] = basename($file);
     } 
 
     return $manifest;
