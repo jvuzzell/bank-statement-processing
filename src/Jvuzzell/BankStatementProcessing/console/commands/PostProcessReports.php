@@ -1,7 +1,7 @@
 <?php
 
-use Jvuzzell\BankStatementProcessing\library\controllers\StatementProcessorParentClass;
-use Jvuzzell\BankStatementProcessing\library\controllers\TrendDetection;
+use Jvuzzell\BankStatementProcessing\library\services\StatementProcessorParentClass;
+use Jvuzzell\BankStatementProcessing\library\services\TrendDetection;
 
 function loadReplacementMap($filename) {
     $map = [];

@@ -1,6 +1,6 @@
 <?php 
 
-namespace Jvuzzell\BankStatementProcessing\library\controllers;
+namespace Jvuzzell\BankStatementProcessing\library\services;
 
 use Smalot\PdfParser\Parser as PdfParser;
 use Jvuzzell\BankStatementProcessing\library\interfaces\StatementProcessorInterface;

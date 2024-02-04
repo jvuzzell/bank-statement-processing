@@ -1,6 +1,6 @@
 <?php 
 
-namespace Jvuzzell\BankStatementProcessing\library\controllers;
+namespace Jvuzzell\BankStatementProcessing\library\services;
 
 class TrendDetection {
     private array $transactions = []; 
