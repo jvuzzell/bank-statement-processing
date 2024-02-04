@@ -13,16 +13,13 @@ class TruistConsolidatedTxtProcessor extends StatementProcessorParentClass {
  
     private string $withdrawalStartHeading = 'Other withdrawals, debits and service charges'; 
     private string $withdrawalEndHeading = 'Total other withdrawals, debits and service charges\s*=\s*\$(\d{1,6}(?:,\d{3})*\.\d{2})';
-    private string $withdrawalEndHeadingAlt = 'Other withdrawals, debits and service charges';  
-    private string $depositStartHeading = 'Deposits, credits and interest\s+';
+    private string $depositStartHeading = 'Deposits, credits and interest\s+DATE\s+DESCRIPTION\s+';
     private string $depositEndHeading = 'Total deposits, credits and interest\s*=\s*\$(\d{1,6}(?:,\d{3})*\.\d{2})';
-    private string $transactionPattern = '/(\d{2}\/\d{2}\s+.*?\s+\d+\.\d{2})/';  
+    private string $transactionPattern = '/(\d{2}\/\d{2}\s+.*?\s+[\d,]+\.\d{2})/';  
     private string $transactionColumnPattern = '/^(\d{2}\/\d{2})\s+(.*?)\s+([\d,]+\.\d{2})\s*$/';
     private string $transactionColumnPatternAlt = '/.*\r(\d{2}\/\d{2})\s+(.*?)\s+([\d,]+\.\d{2})\s*$/';
     private string $withdrawalBalancePattern = '/Total other withdrawals, debits and service charges\s*=\s*\$(\d{1,6}(?:,\d{3})*\.\d{2})/';
     private string $depositBalancePattern = '/Total deposits, credits and interest\s*=\s*\$(\d{1,6}(?:,\d{3})*\.\d{2})/';
-
-    private string $depositsPattern = "/Deposits, credits and interest\s+DATE\s+DESCRIPTION\s+(.*?)\s+Total deposits, credits and interest\s+\=/s"; 
 
     public function __construct(array $statementMeta, string $filePath) 
     {
@@ -38,11 +35,7 @@ class TruistConsolidatedTxtProcessor extends StatementProcessorParentClass {
         $accountPattern = '/Checking and money market savings accounts\s+(.*?)\s+Questions, comments or errors?/s';
         preg_match($accountPattern, $this->textfile, $accountMatches);
 
-        file_put_contents(TMP_DIR . 'truist_consolidated_txt.txt', $accountMatches[0]); 
-
         $this->transactions = $this->extractAccounts($accountMatches[0]);
-
-        file_put_contents(TMP_DIR . 'truist_consolidated.json', json_encode($transactions, JSON_PRETTY_PRINT));
     }
 
     private function extractAccounts(string $accountData) : array
@@ -52,15 +45,6 @@ class TruistConsolidatedTxtProcessor extends StatementProcessorParentClass {
             $transactions[$accountNumber]['transactions'] = [];
 
             foreach($this->accountIdentifiers as $accountIdentifier) { 
-                
-                if(preg_match('/SAVINGS/', $accountIdentifier)) { 
-                    $transactions[$accountNumber]['accountType'] = 'savings';
-                }
-
-                if(preg_match('/CHECKING/', $accountIdentifier)) { 
-                    $transactions[$accountNumber]['accountType'] = 'checking';
-                }
-
                 $accountTransactionsPattern = '/' . $accountIdentifier . $accountNumber . '\s+(.*?)\s+' . $this->depositEndHeading . '/s'; 
                 preg_match($accountTransactionsPattern, $accountData, $transactionMatches);
 
@@ -71,6 +55,15 @@ class TruistConsolidatedTxtProcessor extends StatementProcessorParentClass {
                 }
 
                 if($transactionMatches) {  
+                    
+                    if(preg_match('/SAVINGS/', $accountIdentifier)) { 
+                        $transactions[$accountNumber]['accountType'] = 'savings';
+                    }
+    
+                    if(preg_match('/CHECKING/', $accountIdentifier)) { 
+                        $transactions[$accountNumber]['accountType'] = 'checking';
+                    }
+
                     // Calculate Balance
                     preg_match($this->depositBalancePattern, $transactionMatches[0], $depositBalanceMatch);
                     $depositBalance = ($depositBalanceMatch) ? $depositBalanceMatch[1] : 0;

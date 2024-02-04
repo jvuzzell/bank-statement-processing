@@ -26,6 +26,7 @@ class CapitalOneCreditPdfProcessor extends StatementProcessorParentClass {
         $pages = $this->pdf->getPages();
         $text = '';
         $transactions = [];
+        $transactionTotal = null;
 
         foreach ($pages as $page) {
             $text .= $page->getText();
@@ -33,6 +34,10 @@ class CapitalOneCreditPdfProcessor extends StatementProcessorParentClass {
        
         // Transaction Total 
         preg_match($this->totalTransactionsPattern, $text, $totalTransactionMatch);
+
+        if(count($totalTransactionMatch) > 1) { 
+            $transactionTotal = $totalTransactionMatch[1];
+        }
 
         // Transactions
         preg_match_all($this->transactionPattern, $text, $transactionMatches, PREG_SET_ORDER);
@@ -51,7 +56,7 @@ class CapitalOneCreditPdfProcessor extends StatementProcessorParentClass {
         
         $this->transactions[$this->accountNumbers[0]] = [
             'transactions' => $transactions, 
-            'balance'      => $totalTransactionMatch[1],
+            'balance'      => $transactionTotal,
             'accountType'  => 'credit'
         ]; 
 
