@@ -15,7 +15,8 @@
     ],
     "require": {
         "vlucas/phpdotenv": "^5.5", 
-        "smalot/pdfparser": "^0.14.0", 
-        "phpoffice/phpword": "^0.18.2"
+        "smalot/pdfparser": "^0.14.0",
+        "doctrine/dbal": "^3.8",
+        "doctrine/migrations": "^3.7"
     }
 }

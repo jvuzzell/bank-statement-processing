@@ -1,6 +1,6 @@
 <?php 
 
-function createStatementManifest($directoryPath) : array {
+function manifestDirContent($directoryPath) : array {
     $files = glob($directoryPath . '*');
     $manifest = [];
 

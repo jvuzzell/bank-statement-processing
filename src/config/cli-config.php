@@ -9,6 +9,9 @@ use Doctrine\Migrations\DependencyFactory;
 
 $config = new PhpFile(__DIR__ . '/../migrations.php'); // Or use one of the Doctrine\Migrations\Configuration\Configuration\* loaders
 
-$conn = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true]);
+$conn = DriverManager::getConnection([
+    'driver' => 'pdo_sqlite', 
+    'path'   => __DIR__ . '/tmp/data/analytics-database.db'
+]);
 
 return DependencyFactory::fromConnection($config, new ExistingConnection($conn));
