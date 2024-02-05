@@ -45,6 +45,10 @@ $commandScripts = [
     'ImportCsvToDatabase' => [
         'description' => 'Imports data from CSV files into the database tables.',
         'usage'       => 'php console.php ImportCsvToDatabase',
+    ], 
+    'GenerateStats' => [
+        'description' => 'Generates and caches statistics as CSV files.',
+        'usage'       => 'php console.php GenerateStats',
     ]
     // Add more commands as needed
 ];
