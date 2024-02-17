@@ -1,9 +1,8 @@
 <?php 
 
-namespace Jvuzzell\BankStatementProcessing\library\services;
+namespace Jvuzzell\BankStatementProcessing\library\services\statements;
 
 use Smalot\PdfParser\Parser as PdfParser;
-use Jvuzzell\BankStatementProcessing\library\interfaces\StatementProcessorInterface;
 use DateTime; 
 
 class CapitalOneCreditPdfProcessor extends StatementProcessorParentClass { 
@@ -42,7 +41,7 @@ class CapitalOneCreditPdfProcessor extends StatementProcessorParentClass {
         // Transactions
         preg_match_all($this->transactionPattern, $text, $transactionMatches, PREG_SET_ORDER);
         foreach ($transactionMatches as $match) { 
-            $credit_or_debit = ($match[4] == '- ') ? 'debit' : 'credit'; 
+            $credit_or_debit = ($match[4] == '- ') ? 'credit' : 'debit'; 
             $sign = ($match[4] == '- ') ? '' : '';
 
             $transactions[] = [
@@ -50,7 +49,7 @@ class CapitalOneCreditPdfProcessor extends StatementProcessorParentClass {
                 // 'post_date' => $match[2],
                 'description' => trim($match[3]), 
                 'credit_or_debit' => $credit_or_debit, 
-                'amount' => $sign . $match[5],
+                'amount' => $match[5],
             ];
         }
         

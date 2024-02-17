@@ -5,7 +5,7 @@
  *          from every file in the (project_directory)/input/statements/ folder
  */
 
-use Jvuzzell\BankStatementProcessing\library\services\StatementProcessorParentClass;
+use Jvuzzell\BankStatementProcessing\library\services\statements\StatementProcessorParentClass;
 use Jvuzzell\BankStatementProcessing\library\services\TrendDetection;
 use Jvuzzell\BankStatementProcessing\library\controllers\BankStatementProcessorFactory;
 

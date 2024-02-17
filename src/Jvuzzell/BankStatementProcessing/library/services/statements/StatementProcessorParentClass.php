@@ -1,6 +1,6 @@
 <?php 
 
-namespace Jvuzzell\BankStatementProcessing\library\services;
+namespace Jvuzzell\BankStatementProcessing\library\services\statements;
 
 use Smalot\PdfParser\Parser as PdfParser;
 use Jvuzzell\BankStatementProcessing\library\interfaces\StatementProcessorInterface;
@@ -26,7 +26,7 @@ class StatementProcessorParentClass implements StatementProcessorInterface {
         'Bank',               // 'CaptialOne'
         'Account Number',     // '1234'
         'Account Type',       // 'Credit', 'Checking', 'Savings'
-        'Statement Period',   // 'MM/YY' 
+        'Statement Period',   // 'YYYY/MM' 
         // 'Valid Statement',    // 'Yes', 'No' 
         'Account Owner',      // 'LastName, FirstName'
         'Transaction Date',   // 'MM/YY'
@@ -85,8 +85,7 @@ class StatementProcessorParentClass implements StatementProcessorInterface {
                     $this->statementMeta['bankName'], 
                     $acctNumber,
                     $accountData['accountType'], // Account Type
-                    $this->statementMeta['month'] . '/' . $this->statementMeta['year'], // Statement Perior
-                    // '',  // 
+                    $this->statementMeta['year'] . '/' . $this->statementMeta['month'], // Statement Period
                     $acctOwner,
                     $transaction['trans_date'], 
                     $transaction['credit_or_debit'], 
@@ -162,6 +161,5 @@ class StatementProcessorParentClass implements StatementProcessorInterface {
         } 
 
         return $tables;
-    } 
-
+    }
 }

@@ -1,39 +1,38 @@
 <?php 
 
-namespace Jvuzzell\BankStatementProcessing\library\services;
+namespace Jvuzzell\BankStatementProcessing\library\services\statements;
 
-use Jvuzzell\BankStatementProcessing\library\interfaces\StatementProcessorInterface;
 use SimpleXMLElement;
 
-class WellsFargoCheckingXmlProcessor extends StatementProcessorParentClass { 
+class DiscoverCreditXmlProcessor extends StatementProcessorParentClass { 
     private $xmlDocument;
-
-    private string $debugOutputFilename = 'wellfargo_checking_log.json';
+    private string $debugOutputFilename = 'discover_credit_log.json';
 
     public function __construct(array $statementMeta, string $filePath) 
     {
         parent::__construct($statementMeta);
         $this->xmlDocument = simplexml_load_file($filePath); 
-        $this->extractTransactions(); 
+        $this->extractTransactions();
     }
 
     public function extractTransactions() 
-    {  
-        $xmlContent = $this->xmlDocument->children()->Part;
+    {
+        $xmlContent = $this->xmlDocument->children();
         $xmlTables = []; 
         $xmlTables = $this->findTableElements(
             $xmlContent
         );
-        
+
         $acctBalance = $this->getAccountBalance($xmlContent); 
+        $this->interestCharge = $this->getAccountInterest($xmlContent); 
         $acctTransactions[$this->accountNumbers[0]] = $this->getAcctTransactions($xmlTables, []); 
-        $acctTransactions[$this->accountNumbers[0]]['balance'] =  $acctBalance;
-        $acctTransactions[$this->accountNumbers[0]]['accountType'] = 'checking';
+        $acctTransactions[$this->accountNumbers[0]]['balance'] =  $acctBalance; 
+        $acctTransactions[$this->accountNumbers[0]]['accountType'] = 'credit';
 
         $this->transactions = $acctTransactions;
-        
+
         file_put_contents(TMP_DIR . $this->debugOutputFilename, json_encode($acctTransactions, JSON_PRETTY_PRINT));
-    } 
+    }  
 
     private function getAcctTransactions(array $xmlTables, array $accountBalances) : array
     {
@@ -42,21 +41,23 @@ class WellsFargoCheckingXmlProcessor extends StatementProcessorParentClass {
             'balance' => 0.00
         ];  
 
-        foreach($xmlTables as $xmlTable) {
+        $count = 0; 
+        foreach($xmlTables as $xmlTable) {  
             $result = $this->isContentInXml(
                 $xmlTable, 
-                'Transaction history'
+                'TRANS.'
             );    
 
-            if($result) { 
+            if($result) {
                 $transactions = [];
                 $balance = 0.00;
                 $skip = false; 
-                $offset = false;
+                $offset = false; 
+                $credit_or_debit = false;
                 
                 $xmlTableContent = $xmlTable->TR;
                 $length = count($xmlTableContent); 
-                
+
                 for ($i = 0; $i < $length; $i++) {
                     $columns = $xmlTableContent[$i]; 
                     // Sometimes we skip rows because Wells Fargo may split the description between
@@ -66,15 +67,21 @@ class WellsFargoCheckingXmlProcessor extends StatementProcessorParentClass {
                         $skip = false;
                         continue;
                     }
+                    
+                    if((string)$columns->TD[0] === 'DATE ') { 
+                        if ((string)$columns->TD[1] === 'PAYMENTS AND CREDITS ') { 
+                            $credit_or_debit = 'credit';
+                        } else if ((string)$columns->TD[1] === 'PURCHASES ') { 
+                            $credit_or_debit = 'debit';
+                        } 
+                    } 
 
                     // This is data we don't want
                     if(
-                        (string)$columns->TH[0] === 'Transaction history ' ||
-                        (string)$columns->TH[0] === 'Transaction history (continued) ' ||
-                        (string)$columns->TH[0] === 'Date ' ||
-                        (string)$columns->TH[0] === '' ||
-                        (string)$columns->TH[0] === 'Check ' || 
-                        (string)$columns->TH[0] === 'Date Number '
+                        (string)$columns->TD[0] === 'TRANS. ' ||
+                        (string)$columns->TD[0] === 'DATE ' ||
+                        (string)$columns->TD[0] === '' ||
+                        (string)$columns->TD[0] === 'AMOUNT '
                     ) {
                         continue;
                     }
@@ -82,10 +89,10 @@ class WellsFargoCheckingXmlProcessor extends StatementProcessorParentClass {
                     $lookAhead = $xmlTableContent[$i + 1];
 
                     if($lookAhead !== null && $lookAhead->TD[0] == '') {
-                        $description = trim((string)$columns->TD[0]) . ' ' . trim((string)$lookAhead->TD[0]); 
+                        $description = trim((string)$columns->TD[1]) . ' ' . trim((string)$lookAhead->TD[1]); 
                         $skip = true;
                     } else { 
-                        $description = trim((string)$columns->TD[0]);
+                        $description = trim((string)$columns->TD[1]);
                     } 
 
                     // As an exception, there are occasions where the description and transaction amount 
@@ -95,22 +102,13 @@ class WellsFargoCheckingXmlProcessor extends StatementProcessorParentClass {
                         $offset = true;
                     }
 
-                    if($offset) {
-                        $transactionAmount = ((string)$columns->TD[2] !== '') ? (string)$columns->TD[2] : (string)$columns->TD[3]; 
-                        $credit_or_debit = ((string)$columns->TD[2] !== '') ? 'credit' : 'debit'; 
-                        $offset = false; 
-                    } else {
-                        $transactionAmount = ((string)$columns->TD[1] !== '') ? (string)$columns->TD[1] : (string)$columns->TD[2]; 
-                        $credit_or_debit = ((string)$columns->TD[1] !== '') ? 'credit' : 'debit'; 
-                    }
-
                     $transactions[] = [
-                        'trans_date'      => trim((string)$columns->TH[0]), 
-                        'description'     => trim($description),
-                        'credit_or_debit' => trim($credit_or_debit),
-                        'amount'          => trim($transactionAmount)
+                        'trans_date'      => trim((string)$columns->TD[0]), 
+                        'description'     => $description,
+                        'credit_or_debit' => $credit_or_debit,
+                        'amount'          => str_replace(['$', '-'], '', trim((string)$columns->TD[3]))
                     ];
-                } 
+                }
 
                 $acctTransactions['transactions'] = array_merge($acctTransactions['transactions'] , $transactions);
             }
@@ -119,15 +117,33 @@ class WellsFargoCheckingXmlProcessor extends StatementProcessorParentClass {
         return $acctTransactions;
     }
 
+    private function getAccountInterest(SimpleXMLElement $xmlContent) : string | bool
+    { 
+        foreach($xmlContent->xpath('//Table') as $xmlTable) { 
+            $result = $this->isContentInXml(
+                $xmlTable, 
+                'TOTAL INTEREST FOR THIS PERIOD '
+            );   
+
+            
+            if($result) {
+                if(preg_match('/\$([\d]+\.[\d]{2})/', (string)$result->TD[1], $match)){
+                    return $match[1];
+                }
+            }
+        } 
+
+        return false;
+    }
+
     private function getAccountBalance(SimpleXMLElement $xmlContent) : string | bool
     {
-        $indicator = '/Ending balance on \$([\d]+\.[\d]{2})';
-
-        foreach($xmlContent->xpath('//P') as $pTag) { 
+        foreach($xmlContent->xpath('//H4') as $xmlTable) { 
             $result = $this->isContentInXml(
-                $pTag, 
-                'Ending balance'
+                $xmlTable, 
+                'New Balance:'
             );   
+
             
             if($result) {
                 if(preg_match('/\$([\d]+\.[\d]{2})/', (string)$result, $match)){
@@ -138,4 +154,4 @@ class WellsFargoCheckingXmlProcessor extends StatementProcessorParentClass {
 
         return false;
     }
-} 
+}

@@ -1,8 +1,7 @@
 <?php 
 
-namespace Jvuzzell\BankStatementProcessing\library\services;
+namespace Jvuzzell\BankStatementProcessing\library\services\statements;
 
-use Jvuzzell\BankStatementProcessing\library\interfaces\StatementProcessorInterface;
 use SimpleXMLElement;
 use DateTime; 
 

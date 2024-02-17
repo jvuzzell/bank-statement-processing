@@ -1,8 +1,8 @@
 <?php 
 
-namespace Jvuzzell\BankStatementProcessing\library\services;
+namespace Jvuzzell\BankStatementProcessing\library\services\statements;
 
-use Jvuzzell\BankStatementProcessing\library\interfaces\StatementProcessorInterface;
+use Exception;
 
 class TruistConsolidatedTxtProcessor extends StatementProcessorParentClass { 
     private $textfile; 
@@ -20,21 +20,20 @@ class TruistConsolidatedTxtProcessor extends StatementProcessorParentClass {
     private string $transactionColumnPatternAlt = '/.*\r(\d{2}\/\d{2})\s+(.*?)\s+([\d,]+\.\d{2})\s*$/';
     private string $withdrawalBalancePattern = '/Total other withdrawals, debits and service charges\s*=\s*\$(\d{1,6}(?:,\d{3})*\.\d{2})/';
     private string $depositBalancePattern = '/Total deposits, credits and interest\s*=\s*\$(\d{1,6}(?:,\d{3})*\.\d{2})/';
+    private string $filePath;
 
     public function __construct(array $statementMeta, string $filePath) 
     {
         parent::__construct($statementMeta);
-        $this->textfile = file_get_contents($filePath); 
+        $this->textfile = file_get_contents($filePath);
         $this->extractTransactions();
     }
 
-    public function extractTransactions() 
+    public function extractTransactions() : void
     { 
         $transactions = array();
-
         $accountPattern = '/Checking and money market savings accounts\s+(.*?)\s+Questions, comments or errors?/s';
         preg_match($accountPattern, $this->textfile, $accountMatches);
-
         $this->transactions = $this->extractAccounts($accountMatches[0]);
     }
 
