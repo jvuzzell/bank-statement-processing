@@ -18,6 +18,12 @@ Input statements from several different banks and the software outputs several r
     - **TASK** - Visualize statistics using modular widgets
     - **TASK** - Provide web and print versions of the Transaction Summary Report
     - **TASK** - Add statement processing for PNC and Bank of America 
+
+--- 
+## Process Diagram
+
+![Command Sequence - Bank Statement Application](planning-notes/20240217_command-sequence.png)
+
 ---
 ## Changelog
 
