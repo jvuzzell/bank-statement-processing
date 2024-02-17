@@ -110,6 +110,7 @@ class TrendDetection {
 
     private function consolidateManifest(array $manifest, array $transactions, array $whitelist): array {
         $consolidatedManifest = []; 
+        $transactionManifest = [];
         
         foreach ($manifest as $term => $data) {
             $whitelistTerm = $this->findWhitelistTerm($term, $whitelist);
@@ -121,22 +122,26 @@ class TrendDetection {
 
             // Create a key from the sorted indices array
             $indicesKey = implode('-', $data['indices']);
-            
+    
             if (!isset($consolidatedManifest[$indicesKey])) { 
                 $transactionMeta = [];
                 foreach($data['indices'] as $index) { 
-                    $transactionMeta[] = [
-                        'Transaction Report ID' => $index, 
-                        'Bank'                 => $transactions[$index][0],
-                        'Account Number'       => $transactions[$index][1],
-                        'Account Type'         => $transactions[$index][2],
-                        'Statement Period'     => $transactions[$index][3],
-                        'Account Owner'        => $transactions[$index][4],
-                        'Transaction Date'     => $transactions[$index][5],
-                        'Transaction Type'     => $transactions[$index][6],
-                        'Transaction Desc'     => $transactions[$index][7],
-                        'Transaction Amount'   => $transactions[$index][8],
-                    ];
+                    $transactionId = $index; // Convert base-0 to base-1 
+                    if(!in_array($transactionId, $transactionManifest)) {
+                        $transactionMeta[] = [
+                            'Transaction Report ID' => $transactionId + 1, 
+                            'Bank'                 => $transactions[$index][0],
+                            'Account Number'       => $transactions[$index][1],
+                            'Account Type'         => $transactions[$index][2],
+                            'Statement Period'     => $transactions[$index][3],
+                            'Account Owner'        => $transactions[$index][4],
+                            'Transaction Date'     => $transactions[$index][5],
+                            'Transaction Type'     => $transactions[$index][6],
+                            'Transaction Desc'     => $transactions[$index][7],
+                            'Transaction Amount'   => $transactions[$index][8],
+                        ];
+                    }
+                    $transactionManifest[] = $index;
                 }
                 $consolidatedManifest[$indicesKey] = [
                     'terms' => [$whitelistTerm],
