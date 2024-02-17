@@ -30,10 +30,6 @@ $commandScripts = [
         'description' => 'Executes all outstanding migrations.',
         'usage'       => 'php console.php Migrate',
     ],
-    'ResetDatabase' => [
-        'description' => 'Resets the database to its initial state and re-applies migrations.',
-        'usage'       => 'php console.php ResetDatabase',
-    ], 
     'RunStatementsReports' => [
         'description' => 'Runs reports on bank statements to aggregate every transactions into a single report and targeted trends into another.', 
         'usage'       => 'php console.php RunStatementReports'
