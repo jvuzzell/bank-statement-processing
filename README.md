@@ -17,4 +17,8 @@ Input statements from several different banks and the software outputs several r
     - **TASK** - Leverage SQLite to query Transaction and Trend Reports to generate statistics
     - **TASK** - Visualize statistics using modular widgets
     - **TASK** - Provide web and print versions of the Transaction Summary Report
-    - **TASK** - Add statement processing for PNC and Bank of America
+    - **TASK** - Add statement processing for PNC and Bank of America 
+---
+## Changelog
+
+2024-02-17 - Added 'CacheStats' feature to print statistics to CSV after querying SQLite database

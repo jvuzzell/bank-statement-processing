@@ -20,7 +20,6 @@ class CacheStats {
             $className = basename($classFile, '.php');
             $fullClassName = "Jvuzzell\\BankStatementProcessing\\library\\services\\stats\\$className";
             if (class_exists($fullClassName) && is_subclass_of($fullClassName, StatsParentClass::class)) {
-          
                 $statsInstance = new $fullClassName($this->dbConnection);
                 $statData = $statsInstance->generateStat();
                 $this->saveStatAsCsv($className, $statData);
