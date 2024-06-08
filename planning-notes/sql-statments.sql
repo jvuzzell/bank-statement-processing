@@ -98,6 +98,21 @@ SELECT statement_period, total_income, total_spending,
 FROM summary
 ORDER BY statement_period;
 
+-- Recurring Expense Totals by Category and Type Over Time
+SELECT tt.taxonomy, re.recurring_transaction_type, re.transaction_desc, re.transaction_amount
+  FROM recurring_expenses re
+  JOIN tags_taxonomy tt ON re.recurring_transaction_type = tt.tag 
+  WHERE re.transaction_type = 'debit'
+  GROUP BY tt.taxonomy, re.transaction_desc
+  ORDER BY tt.taxonomy DESC;
+  
+SELECT tt.taxonomy, re.statement_period, sum(re.transaction_amount)
+  FROM recurring_expenses re
+  JOIN tags_taxonomy tt ON re.recurring_transaction_type = tt.tag 
+  WHERE re.transaction_type = 'debit'
+  GROUP BY tt.taxonomy, re.statement_period
+  ORDER BY tt.taxonomy, re.statement_period DESC;
+
 -- Income Analysis --
 
 -- Total income per category
