@@ -1,4 +1,15 @@
+# Bank Statement Processing 
+
 This repository contains scripts to process and analyze bank statements, generating reports and statistics. The scripts are designed to be run in sequence using console commands. Below is a guide on how to set up and use the provided scripts.
+
+## Resources
+1. [Project Roadmap](/documentation/planning.md)
+1. Documentation
+    - [RunStatementsReport](/documentation/command_RunStatementsReports.md)
+    - [PostProcessReports](/documentation/command_PostProcessReports.md)
+    - [Migrate](/documentation/command_Migrate.md)
+    - [ImportCsvToDatabase](/documentation/command_ImportCsvToDatabase.md)
+    - [GenerateStats](/documentation/command_GenerateStats.md)
 
 ## Prerequisites
 
@@ -22,14 +33,6 @@ This repository contains scripts to process and analyze bank statements, generat
     composer install
     ```
 
-1. **Configure the application:**
-
-    Copy the example configuration file and modify it according to your setup:
-
-    ```bash
-    cp config.example.php config.php
-    ```
-
 1. **Set up the database:**
 
 Ensure your database is set up and accessible. If using SQLite, make sure the database file and its directory are writable.
@@ -37,6 +40,21 @@ Ensure your database is set up and accessible. If using SQLite, make sure the da
 ## Usage
 
 The main entry point for running scripts is console.php. The available commands can be executed sequentially to process the bank statements and generate the required reports.
+
+1. **Setup Input Directories**
+Add the following directories to your project: 
+
+```bash
+cd input
+mkdir statements
+mkdir data-analysis
+```
+
+1. **Add Statements** 
+To add a statement, rename the statement to `FirstName-LastName_BankName[Credit|Debit|Checking|Savings]_MMYYY_Last-Four-Digits-BankAccount.ext`
+
+Example: `Sam-Jackson_SuntrustChecking_012022_1234.pdf`
+
 
 ### Available Commands
 

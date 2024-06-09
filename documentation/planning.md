@@ -22,7 +22,7 @@ Input statements from several different banks and the software outputs several r
 --- 
 ## Process Diagram
 
-![Command Sequence - Bank Statement Application](planning-notes/20240217_command-sequence.png)
+![Command Sequence - Bank Statement Application](../planning-notes/20240217_command-sequence.png)
 
 ---
 ## Changelog
